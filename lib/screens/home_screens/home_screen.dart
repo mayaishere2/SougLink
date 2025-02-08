@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:souglink/screens/farmer/farmerDrawer.dart';
 import 'package:souglink/screens/farmer/harvest_info.dart';
 import 'package:souglink/screens/home_screens/prices_page.dart';
-
 
 class HomePageFarmer extends StatefulWidget {
   const HomePageFarmer({super.key});
@@ -12,6 +13,59 @@ class HomePageFarmer extends StatefulWidget {
 }
 
 class _HomePageFarmerState extends State<HomePageFarmer> {
+  List<Map<String, String>> prices = [];
+  List<Map<String, dynamic>> savedProducts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPrices();
+    _fetchSavedProducts();
+  }
+
+  Future<void> _fetchPrices() async {
+  FirebaseFirestore.instance.collection('Prices').get().then((querySnapshot) {
+    if (!mounted) return;
+    setState(() {
+      prices = querySnapshot.docs.map((doc) {
+        var data = doc.data();
+        return {
+          'name': data['name']?.toString() ?? '',
+          'price': data['price']?.toString() ?? '',
+        };
+      }).toList();
+    });
+  }).catchError((error) {
+    debugPrint("Error fetching prices: $error");
+  });
+}
+
+
+  Future<void> _fetchSavedProducts() async {
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return;
+
+  FirebaseFirestore.instance
+      .collection("user's harvest")
+      .doc(userId)
+      .collection('products')
+      .get()
+      .then((querySnapshot) {
+        if (!mounted) return;
+        setState(() {
+          savedProducts = querySnapshot.docs.map((doc) {
+            var data = doc.data();
+            return {
+              'name': data['name'] ?? '',
+              'image': data['image'] ?? '',
+            };
+          }).toList();
+        });
+      }).catchError((error) {
+        debugPrint("Error fetching saved products: $error");
+      });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -19,16 +73,13 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
       appBar: null,
       drawer: the_Drawer(), 
       backgroundColor: const Color(0xFFE4F3E2),
-      body:
-      Column(
+      body: Column(
         children: [
-          // Custom AppBar with clipped background
           SizedBox(
-            height: 200, // Total height for the header
+            height: 200,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // Diagonal clipped background
                 Positioned.fill(
                   child: ClipPath(
                     clipper: DiagonalClipper(),
@@ -37,7 +88,6 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
                     ),
                   ),
                 ),
-                // AppBar placed above the diagonal background
                 Positioned(
                   top: 10,
                   left: 300,
@@ -51,7 +101,7 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
                           },
                         );
                       },
-                    ), // Assuming this is your custom AppBar widget
+                    ),
                 ),
                 Positioned(
                   top: 10,
@@ -66,7 +116,7 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                  ), // Assuming this is your custom AppBar widget
+                  ),
                 ),
                 Positioned(
                   top: 160,
@@ -83,7 +133,6 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
               ],
             ),
           ),
-          // Main content scrollable area
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -91,118 +140,43 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'السوق', // First word
-                          style: TextStyle(
-                            fontFamily: 'NotoSansArabic_SemiCondensed',
-                            fontSize: 18,
-                            color: const Color.fromARGB(200, 15, 75, 6), // Black color for the first word
-                          ),
-                        ),
-                        const SizedBox(width: 5), // Add space between words
-                        Text(
-                          'عليك', // Second word
-                          style: TextStyle(
-                            fontFamily: 'NotoSansArabic_SemiCondensed',
-                            fontSize: 18,
-                            color: Colors.black, // Dark green color for the second word
-                          ),
-                        ),
-                        
-                        const SizedBox(width: 5), // Add space between words
-                        Text(
-                          'و اللينك', // Fourth word
-                          style: TextStyle(
-                            fontFamily: 'NotoSansArabic_SemiCondensed',
-                            fontSize: 18,
-                            color: const Color.fromARGB(200, 15, 75, 6), // Dark green color for the fourth word
-                          ),
-                        ),
-                        const SizedBox(width: 5), // Add space between words
-                        Text(
-                          'علينا', // Fifth word
-                          style: TextStyle(
-                            fontFamily: 'NotoSansArabic_SemiCondensed',
-                            fontSize: 18,
-                            color: Colors.black, // Black color for the fifth word
-                          ),
-                        ),
-                      ],
-                    ),
-
                     const SizedBox(height: 20),
-
-                    // Average Prices Section
                     _buildSectionTitle('متوسط الأسعار'),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Container(
                         height: 200,
                         child: Row(
-                          children: List.generate(3, (index) {
-                             return Transform.translate(
-                              offset: Offset(0, (index % 2 == 0) ? 10.0 : -10.0), // Alternating Y position
-                              child: _buildPriceCard('assets/tomato.jpg', 'الطماطم', '20 دج / كغ', index),
-                            );
-                          }),
-                                            ),
+                          children: prices.map((priceData) {
+                            return _buildPriceCard('assets/tomato.jpg', priceData['name'] ?? '', priceData['price'] ?? '');
+                          }).toList(),
+                        ),
                       ),
                     ),
-                    
                     const SizedBox(height: 20),
+                    _buildSectionTitle('المحاصيل المحفوظة'),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: savedProducts.map((product) {
+                          return _buildCropButton(context, product['image'] ?? 'assets/default.jpg', product['name'] ?? '');
+                        }).toList(),
+                      ),
+                    ),
 
-                    // Crop Tracking Section
-                    _buildSectionTitle('تتبع محاصيل زراعية'),
-                    Row(
-                      
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildCropButton('assets/tomato.png', 'القمح'),
-                        _buildCropButton('assets/potato.jpg', 'البطاطا'),
-                        _buildCropButton('assets/tomato.png', 'الطماطم'),
-                      ],
-                    ), 
                   ],
                 ),
-              ), 
+              ),
             ),
-          ), 
+          ),
         ],
       ),
-    
-      
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontFamily: 'NotoSansArabic_SemiCondensed',
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 15, 75, 6),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceCard(String imagePath, String productName, String price, int index) {
-  // Determine vertical offset for alternating positions
-  double verticalOffset = (index % 2 == 0) ? 10.0 : -10.0;
-
-  return Positioned(
-    top: 10 + verticalOffset * index, // Alternating Y position
-    child: Container(
+  Widget _buildPriceCard(String imagePath, String productName, String price) {
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8.0),
       width: 130,
       height: 165,
@@ -236,88 +210,29 @@ class _HomePageFarmerState extends State<HomePageFarmer> {
                 color: Colors.black,
               ),
             ),
-            const SizedBox(height: 3),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> PricesPage() ));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 15, 75, 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                minimumSize: const Size(58, 19),
-              ),
-              child: const Text(
-                'المزيد',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'NotoSansArabic_SemiCondensed',
-                  fontSize: 10,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PricesPage()),
+    );
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Color.fromARGB(255, 15, 75, 6),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+      
     ),
-  );
-}
+    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2), // Smaller padding
+    minimumSize: Size(60, 5),
+  ),
+  child: Text(
+    'المزيد',
+    
+    style: TextStyle(color: Colors.white, fontFamily: 'NotoSansArabic_SemiCondensed', fontSize: 9),
+  ),
+),
 
-
-  Widget _buildCropButton(String imagePath, String cropName) {
-    return Container(
-      width: 106, 
-      height: 145,
-      decoration: BoxDecoration(
-        color: Color.fromARGB(129, 255, 255, 255),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Color.fromARGB(255, 15, 75, 6), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color.fromARGB(0, 255, 255, 255),
-                border: Border.all(color: Color.fromARGB(0, 15, 75, 6), width: 0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(0),
-                child: Image.asset(imagePath, fit: BoxFit.contain),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              cropName,
-              style: const TextStyle(
-                fontFamily: 'NotoSansArabic_SemiCondensed',
-                fontSize: 12,
-              ),
-            ),
-            SizedBox(height: 10,),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 15, 75, 6), // Background color of the button
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Optional: Add rounded corners
-                  ),
-                  minimumSize: Size(50, 16)
-              ),
-              onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> HarvestInfoPage(product: {'name': cropName, 'image': imagePath})));
-            }, child: Text('تتبع',
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'NotoSansArabic_SemiCondensed',
-              fontSize: 9,
-            ),
-            ))
           ],
         ),
       ),
@@ -339,3 +254,94 @@ class DiagonalClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
+
+
+Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontFamily: 'NotoSansArabic_SemiCondensed',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 15, 75, 6),
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildCropButton(BuildContext context, String imagePath, String cropName) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 8.0),
+    width: 106, 
+    height: 145,
+    decoration: BoxDecoration(
+      color: Color.fromARGB(129, 255, 255, 255),
+      borderRadius: BorderRadius.circular(15),
+      border: Border.all(color: Color.fromARGB(255, 15, 75, 6), width: 1),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color.fromARGB(0, 255, 255, 255),
+              border: Border.all(color: Color.fromARGB(0, 15, 75, 6), width: 0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(0),
+              child: Image.asset(imagePath, fit: BoxFit.contain),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            cropName,
+            style: const TextStyle(
+              fontFamily: 'NotoSansArabic_SemiCondensed',
+              fontSize: 12,
+            ),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromARGB(255, 15, 75, 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              minimumSize: Size(50, 16),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HarvestInfoPage(
+                    product: {'name': cropName, 'image': imagePath},
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              'تتبع',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'NotoSansArabic_SemiCondensed',
+                fontSize: 9,
+              ),
+            ),
+          )
+        ],
+      ),
+    ),
+  );
+}
+
+

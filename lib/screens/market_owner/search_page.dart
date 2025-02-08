@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:souglink/screens/market_owner/FarmerProfile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'SellerDrawer.dart';
 
 class SearchPage extends StatefulWidget {
@@ -14,55 +15,66 @@ class _SearchPageState extends State<SearchPage> {
   final List<String> tabs = ["الاسم", "السعر", "المنتج", "الخدمة", "الموقع"];
   int selectedTab = 0;
 
-  // Dummy data for farmers
-  final List<Map<String, String>> farmers = [
-    {
-      'name': 'علي جابر',
-      'city': 'مدينة الجزائر، زرالدة',
-      'image': 'assets/profile.jpg', // Correct image path
-      'capacity': '10 طن',
-    },
-    {
-      'name': 'سمير عبد العزيز',
-      'city': 'مدينة الجزائر، باب الزوار',
-      'image': 'assets/profile.jpg', // Correct image path
-      'capacity': '15 طن',
-    },
-    {
-      'name':  'فؤاد سعيد ',
-      'city': 'مدينة وهران، وهران',
-      'image': 'assets/profile.jpg', // Correct image path
-      'capacity': '12 طن',
-    },
-    {
-      'name':  'ياسمين علي',
-      'city': 'مدينة قسنطينة، قسنطينة',
-      'image': 'assets/profile.jpg', // Correct image path
-      'capacity': '8 طن',
-    },
-    {
-      'name': 'عبد الله مصطفى الحسن',
-      'city': 'مدينة تلمسان، تلمسان',
-      'image': 'assets/profile.jpg', // Correct image path
-      'capacity': '20 طن',
-    },
-  ];
-
-  // Filtered list of farmers based on search query
-  List<Map<String, String>> filteredFarmers = [];
+  List<Map<String, dynamic>> farmers = [];
+  List<Map<String, dynamic>> filteredFarmers = [];
 
   @override
   void initState() {
     super.initState();
-    filteredFarmers = farmers;
+    fetchFarmers();
+  }
+
+// Fetch farmers from Firebase
+  void fetchFarmers() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('userType', isEqualTo: 'مزارع')
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        print("No farmers found");
+      }
+
+      List<Map<String, dynamic>> fetchedFarmers = snapshot.docs.map((doc) {
+  return {
+    'id': doc.id, // Include the document ID
+    'name': "${doc['firstName']} ${doc['lastName']}",
+    'city': doc['location'] ?? 'غير معروف',
+    'image': doc['profilePic'] ?? '', // Store the profile picture (URL or empty string)
+    'phoneNumber': doc['phoneNumber'] ?? '',
+  };
+}).toList();
+
+
+      setState(() {
+        farmers = fetchedFarmers;
+        filteredFarmers = fetchedFarmers;
+      });
+    } catch (e) {
+      print("Error fetching farmers: $e");
+    }
   }
 
   // Search method to filter farmers by name
   void _searchFarmers(String query) {
+    final queryLower = query.toLowerCase();
+
     final filtered = farmers.where((farmer) {
-      final nameLower = farmer['name']!.toLowerCase();
-      final queryLower = query.toLowerCase();
-      return nameLower.contains(queryLower);
+      switch (selectedTab) {
+        case 0: // Filter by Name
+          return farmer['name']!.toLowerCase().contains(queryLower);
+        case 1: // Filter by Price (if price data is available)
+          return farmer['price']?.toString().contains(queryLower) ?? false;
+        case 2: // Filter by Product
+          return farmer['product']?.toLowerCase().contains(queryLower) ?? false;
+        case 3: // Filter by Service
+          return farmer['service']?.toLowerCase().contains(queryLower) ?? false;
+        case 4: // Filter by Location
+          return farmer['city']!.toLowerCase().contains(queryLower);
+        default:
+          return true;
+      }
     }).toList();
 
     setState(() {
@@ -79,10 +91,11 @@ class _SearchPageState extends State<SearchPage> {
         drawer: the_Drawer(), // Your custom Drawer widget
         backgroundColor: const Color(0xFFE4F3E2),
         body: Column(
-          
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Align(
               alignment: Alignment.topRight,
               child: IconButton(
@@ -110,7 +123,7 @@ class _SearchPageState extends State<SearchPage> {
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'NotoSansArabic_SemiCondensed',
-                          ),
+                            ),
                         ),
                       ),
                       Row(
@@ -166,7 +179,8 @@ class _SearchPageState extends State<SearchPage> {
                 height: 42,
                 width: 254,
                 child: TextField(
-                  onChanged: _searchFarmers, // Call search method on input change
+                  onChanged:
+                      _searchFarmers, // Call search method on input change
                   decoration: InputDecoration(
                     hintText: 'بحث',
                     hintStyle: const TextStyle(
@@ -210,6 +224,7 @@ class _SearchPageState extends State<SearchPage> {
                         onSelected: (bool selected) {
                           setState(() {
                             selectedTab = index;
+                            _searchFarmers(''); // Apply filter without input
                           });
                         },
                         selectedColor: Color.fromARGB(255, 15, 75, 6),
@@ -229,7 +244,8 @@ class _SearchPageState extends State<SearchPage> {
             // Farmers List
             Expanded(
               child: ListView.builder(
-                itemCount: filteredFarmers.length, // Use the filtered list of farmers
+                itemCount:
+                    filteredFarmers.length, // Use the filtered list of farmers
                 itemBuilder: (context, index) {
                   return Card(
                     margin: const EdgeInsets.all(8.0),
@@ -241,35 +257,37 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                     ),
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-                      leading: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Color.fromARGB(255, 15, 75, 6),
-                            width: 2,
-                          ),
-                          image: DecorationImage(
-                            image: AssetImage(filteredFarmers[index]['image']!),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      title: Text(filteredFarmers[index]['name']!, style: TextStyle(fontFamily: 'NotoSansArabic_SemiCondensed', fontSize: 15)),
-                      subtitle: Text(filteredFarmers[index]['city']!, style: TextStyle(fontSize: 10)),
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 16.0),
+                      leading: CircleAvatar(
+  radius: 30,
+  backgroundColor: Colors.transparent,
+  backgroundImage: filteredFarmers[index]['image']!.isNotEmpty
+      ? NetworkImage(filteredFarmers[index]['image']!) as ImageProvider
+      : AssetImage('assets/profile.jpg'),
+),
+
+                      title: Text(filteredFarmers[index]['name']!,
+                          style: TextStyle(
+                              fontFamily: 'NotoSansArabic_SemiCondensed',
+                              fontSize: 15)),
+                      subtitle: Text(filteredFarmers[index]['city']!,
+                          style: TextStyle(fontSize: 10)),
                       trailing: ElevatedButton(
                         onPressed: () {
                           // Navigate to the farmer's profile page
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => Farmerprofile(
-                                farmerName: filteredFarmers[index]['name']!,
-                                farmerLocation: filteredFarmers[index]['city']!,
-                              ),
-                            ),
+                           MaterialPageRoute(
+  builder: (context) => Farmerprofile(
+    farmerId: filteredFarmers[index]['id'] ?? '',  // Default to an empty string
+    farmerName: filteredFarmers[index]['name'] ?? 'مزارع مجهول', 
+    farmerLocation: filteredFarmers[index]['city'] ?? 'غير معروف', 
+    farmerImage: filteredFarmers[index]['image'] ?? 'assets/profile.jpg', 
+  ),
+),
+
+
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -280,7 +298,10 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         child: const Text(
                           'المزيد',
-                          style: TextStyle(color: Colors.white, fontFamily: 'NotoSansArabic_SemiCondensed', fontSize: 9),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'NotoSansArabic_SemiCondensed',
+                              fontSize: 9),
                         ),
                       ),
                     ),

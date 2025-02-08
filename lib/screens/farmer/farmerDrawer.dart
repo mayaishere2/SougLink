@@ -15,7 +15,8 @@ class the_Drawer extends StatefulWidget {
 
 class _DrawerState extends State<the_Drawer> {
   String userName = 'اسم المستخدم';
-  String profilePic = 'assets/profile.jpg';
+  String profilePic = 'assets/profile.jpg'; // Local default image
+bool isLoading = true; // Add loading state
 
   @override
   void initState() {
@@ -25,32 +26,38 @@ class _DrawerState extends State<the_Drawer> {
     void fetchUserData() async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (user == null) {
+      print("No user logged in.");
+      return;
+    }
 
-      if (userDoc.exists && mounted) {
-        setState(() {
-          String firstName = userDoc['firstName'] ?? '';
-          String lastName = userDoc['lastName'] ?? '';
-          userName = "$firstName $lastName";
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
 
-          // ✅ Ensure valid Cloudinary URL
-          if (userDoc['profilePic'] != null && userDoc['profilePic'].startsWith('http')) {
-            profilePic = userDoc['profilePic'];
+    if (!userDoc.exists) {
+      print("User document does not exist.");
+      return;
+    }
 
-            // ✅ Optimize the image (resize, compress)
-            profilePic = "$profilePic?w=200&h=200&c=fill&q=80"; 
-          } else {
-            print("Invalid profilePic path in Firestore, using default.");
-            profilePic = "https://your-default-image-url.com"; // Default profile picture
-          }
-        });
-      }
+    if (mounted) {
+      setState(() {
+        userName = "${userDoc['firstName'] ?? ''} ${userDoc['lastName'] ?? ''}";
+        
+        // Ensure profilePic is a valid URL
+        if (userDoc['profilePic'] != null && Uri.tryParse(userDoc['profilePic'])?.hasAbsolutePath == true) {
+          profilePic = userDoc['profilePic'];
+        } else {
+          profilePic = "https://your-default-image-url.com";
+        }
+
+        isLoading = false; // Loading is complete
+      });
     }
   } catch (e) {
     print("Error fetching user data: $e");
   }
 }
+
+
 
   Widget build(BuildContext context) {
     return Drawer(
@@ -72,22 +79,25 @@ class _DrawerState extends State<the_Drawer> {
                   children: [
                     const SizedBox(height: 30),
                     Container(
-                      height: 60,
-                      width: 60,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(35),
-                        child: profilePic.startsWith('http')
-                            ? FadeInImage.assetNetwork(
-                                placeholder: 'assets/loading.gif', 
-                                image: profilePic,
-                                fit: BoxFit.cover,
-                                imageErrorBuilder: (context, error, stackTrace) {
-                                  return Image.asset('assets/profile.jpg'); // Fallback
-                                },
-                              )
-                            : Image.asset(profilePic, fit: BoxFit.cover),
-                      ),
-                    ),
+  height: 60,
+  width: 60,
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(35),
+    child: isLoading
+        ? CircularProgressIndicator() // Show loading indicator
+        : profilePic.startsWith('http')
+            ? FadeInImage.assetNetwork(
+                placeholder: 'assets/loading.gif',
+                image: profilePic,
+                fit: BoxFit.cover,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/profile.jpg'); // Fallback
+                },
+              )
+            : Image.asset(profilePic, fit: BoxFit.cover),
+  ),
+),
+
                     const SizedBox(height: 10),
                     Text(
                       userName,

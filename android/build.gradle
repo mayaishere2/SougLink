@@ -12,18 +12,18 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
-}
-
 buildscript {
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1' // Ensure Gradle version is correct
-        classpath 'com.google.gms:google-services:4.3.8'  // Ensure this is present
+    classpath 'com.android.tools.build:gradle:7.3.1' // Ensure Gradle version is correct
+    classpath 'com.google.gms:google-services:4.3.8'  // Ensure this is present // Add this line if missing
+
     }
     repositories {
         google()
         mavenCentral()
     }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
 }

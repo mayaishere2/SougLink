@@ -39,6 +39,9 @@ class _SignupPageState extends State<SignupPage> {
           'email': _emailController.text,
           'phoneNumber': _phoneController.text,
           'userType': selectedUserType,
+          'profilePic': null,
+          'location': null,
+          
         });
 
         ScaffoldMessenger.of(context).showSnackBar(

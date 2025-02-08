@@ -31,7 +31,7 @@ class _MainPageSellerState extends State<MainPageSeller> {
     Profile(),
     Stocklevel(),
     SearchPage(),
-    NotificationsPage(),
+    ResponsesPage(),
     HomePageSeller(),
     ResponsesPage(),
     LoginPage(), // Updated to use LoginPage

@@ -39,9 +39,9 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
     String userId = user.uid; // Use UID to get user's products
 
     FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Use 'users' collection
         .doc(userId)
-        .collection('products')
+        .collection('products') // Fetch from user's 'products' subcollection
         .get()
         .then((querySnapshot) {
       setState(() {
@@ -71,9 +71,9 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
     String userId = user.uid; // Get user ID
 
     return FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Updated Firestore path
         .doc(userId)
-        .collection('products')
+        .collection('products') // Fetch from user's products subcollection
         .where('name', isEqualTo: item.trim()) // Find the product by name
         .snapshots()
         .map((querySnapshot) {
@@ -120,9 +120,9 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
 
     // Reference to the user's specific product document
     QuerySnapshot productQuery = await FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Updated Firestore path
         .doc(userId)
-        .collection('products')
+        .collection('products') // Fetch from user's products subcollection
         .where('name', isEqualTo: currentSelectedItem)
         .get();
 
@@ -154,9 +154,9 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
 
     // Reference to the user's specific product document
     QuerySnapshot productQuery = await FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Updated Firestore path
         .doc(userId)
-        .collection('products')
+        .collection('products') // Fetch from user's products subcollection
         .where('name', isEqualTo: currentSelectedItem)
         .get();
 
@@ -191,9 +191,9 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
     String userId = user.uid; // Get user ID
 
     return FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Updated Firestore path
         .doc(userId)
-        .collection('products')
+        .collection('products') // Fetch from user's products subcollection
         .snapshots()
         .map((snapshot) {
       Map<String, int> updatedStockLevels = {};
@@ -218,10 +218,11 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
       return;
     }
 
+    // Fetch product name based on Firestore structure
     String productName = await _fetchProductName(userId, currentSelectedItem!);
 
     if (productName.isEmpty) {
-      print("Product name not found for ID: $currentSelectedItem");
+      print("Product name not found for: $currentSelectedItem");
       return;
     }
 
@@ -229,8 +230,7 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
 
     String nowDate = DateTime.now().toLocal().toString().split(' ')[0];
     TimeOfDay nowTime = TimeOfDay.fromDateTime(DateTime.now());
-    String formattedTime =
-        "${nowTime.hour}:${nowTime.minute}"; // Manual time formatting
+    String formattedTime = "${nowTime.hour}:${nowTime.minute}";
 
     String imageAdd = 'assets/images/add.png';
     String imageRemove = 'assets/images/remove.png';
@@ -251,15 +251,17 @@ class _StockHistoryPageState extends State<StockHistoryPage> {
 
   Future<String> _fetchProductName(String userId, String productId) async {
     try {
-      DocumentReference productRef = FirebaseFirestore.instance
-          .collection('users_products')
+      // Correct Firestore path
+      CollectionReference productsRef = FirebaseFirestore.instance
+          .collection('users') // Corrected collection name
           .doc(userId)
-          .collection('products')
-          .doc(productId);
+          .collection('products');
 
-      DocumentSnapshot productDoc = await productRef.get();
-      if (productDoc.exists) {
-        return productDoc['name'] ?? '';
+      QuerySnapshot querySnapshot =
+          await productsRef.where('name', isEqualTo: productId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first['name'] ?? '';
       }
       print("Product not found in Firestore.");
     } catch (e) {

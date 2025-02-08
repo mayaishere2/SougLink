@@ -66,9 +66,9 @@ class _StocklevelState extends State<Stocklevel> {
     String userId = user.uid; // Use UID to store user's products
 
     CollectionReference userProductsRef = FirebaseFirestore.instance
-        .collection('users_products')
+        .collection('users') // Use 'users' collection
         .doc(userId)
-        .collection('products');
+        .collection('products'); // Products subcollection inside user document
 
     // Check if the product already exists
     QuerySnapshot query =
@@ -289,24 +289,54 @@ class _StocklevelState extends State<Stocklevel> {
                 ),
                 const SizedBox(height: 5),
                 Expanded(
-                  child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('products')
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (!snapshot.hasData) {
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseAuth.instance.currentUser == null
+                        ? Stream.empty()
+                        : FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .collection('products')
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
 
-                      var products = snapshot.data!.docs.where((doc) {
-                        String name = doc['name'].toString();
-                        return searchText.isEmpty || name.contains(searchText);
-                      }).toList();
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Text("لا توجد منتجات متاحة",
+                              style: TextStyle(fontSize: 16)),
+                        );
+                      }
+
+                      var products = snapshot.data!.docs;
+
+                      // Debugging: Log the products fetched from Firestore
+                      print("Fetched products count: ${products.length}");
+                      for (var product in products) {
+                        print("Product Data: ${product.data()}");
+                      }
 
                       return ListView.builder(
                         itemCount: products.length,
                         itemBuilder: (context, index) {
                           var product = products[index];
+                          var productData =
+                              product.data() as Map<String, dynamic>? ?? {};
+
+                          // Ensure all fields are safely accessed
+                          String name =
+                              productData['name']?.toString() ?? 'غير معروف';
+                          String amount = '${productData['amount'] ?? 0} كج.';
+                          String status =
+                              productData['status']?.toString() ?? 'غير محدد';
+
+                          // Apply search filter inside ListView.builder
+                          if (searchText.isNotEmpty &&
+                              !name.contains(searchText)) {
+                            return SizedBox
+                                .shrink(); // Hide item if it doesn't match searchText
+                          }
 
                           return GestureDetector(
                             onTap: () {
@@ -316,11 +346,7 @@ class _StocklevelState extends State<Stocklevel> {
                               });
                             },
                             child: buildCard(
-                              product['name'],
-                              '${product['amount']} كج.',
-                              product['status'],
-                              getImagePath(product['name']),
-                            ),
+                                name, amount, status, getImagePath(name)),
                           );
                         },
                       );
@@ -442,16 +468,37 @@ class _StocklevelState extends State<Stocklevel> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                await FirebaseFirestore.instance
-                                    .collection('products')
-                                    .where('name', isEqualTo: title)
-                                    .get()
-                                    .then((snapshot) {
-                                  for (var doc in snapshot.docs) {
-                                    doc.reference.delete();
+                                try {
+                                  User? user =
+                                      FirebaseAuth.instance.currentUser;
+                                  if (user == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'يجب عليك تسجيل الدخول أولاً!')),
+                                    );
+                                    return;
                                   }
-                                });
-                                Navigator.of(context).pop();
+
+                                  var userProductsRef = FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(user.uid)
+                                      .collection('products');
+
+                                  var productsSnapshot = await userProductsRef
+                                      .where('name', isEqualTo: title)
+                                      .get();
+
+                                  for (var productDoc
+                                      in productsSnapshot.docs) {
+                                    await productDoc.reference.delete();
+                                  }
+
+                                  Navigator.of(context).pop();
+                                } catch (e) {
+                                  print("Error deleting product: $e");
+                                }
                               },
                               child: Text("حذف",
                                   style: TextStyle(color: Colors.red)),

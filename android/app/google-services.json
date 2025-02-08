@@ -12,12 +12,16 @@
           "package_name": "com.example.souglink"
         }
       },
+<<<<<<< Updated upstream
       "oauth_client": [
         {
           "client_id": "763894853613-fk11a8v0rlukpd9ejfa480uhalobajci.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
+=======
+      "oauth_client": [],
+>>>>>>> Stashed changes
       "api_key": [
         {
           "current_key": "AIzaSyAkAJyeKpLKgJlKVdpyjp8wcv_s3n1mum8"
@@ -25,12 +29,16 @@
       ],
       "services": {
         "appinvite_service": {
+<<<<<<< Updated upstream
           "other_platform_oauth_client": [
             {
               "client_id": "763894853613-fk11a8v0rlukpd9ejfa480uhalobajci.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
+=======
+          "other_platform_oauth_client": []
+>>>>>>> Stashed changes
         }
       }
     }

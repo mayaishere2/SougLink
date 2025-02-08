@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:souglink/AppBar_drawer_bottomNavBar/drawer.dart';
+//import 'package:souglink/AppBar_drawer_bottomNavBar/drawer.dart';
 
 class PricesPage extends StatefulWidget {
   const PricesPage({super.key});
@@ -41,7 +41,8 @@ class _PricesPageState extends State<PricesPage> {
   void initState() {
     super.initState();
     filteredItems = items; // Initially show all items
-    _searchController.addListener(_filterItems); // Add listener to update filtered items
+    _searchController
+        .addListener(_filterItems); // Add listener to update filtered items
   }
 
   // Filter the items based on the search query
@@ -49,7 +50,9 @@ class _PricesPageState extends State<PricesPage> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       filteredItems = items.where((item) {
-        return item['product']!.toLowerCase().contains(query); // Filter items based on product name
+        return item['product']!
+            .toLowerCase()
+            .contains(query); // Filter items based on product name
       }).toList();
     });
   }
@@ -154,7 +157,8 @@ class _PricesPageState extends State<PricesPage> {
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
                     return Container(
-                      padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 10),
+                      padding: EdgeInsets.only(
+                          top: 10, left: 20, right: 20, bottom: 10),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(127, 255, 255, 255),
@@ -182,7 +186,8 @@ class _PricesPageState extends State<PricesPage> {
                                   Text(
                                     item['product']!,
                                     style: TextStyle(
-                                      fontFamily: 'NotoSansArabic_SemiCondensed',
+                                      fontFamily:
+                                          'NotoSansArabic_SemiCondensed',
                                       fontSize: 9,
                                       color: Colors.black,
                                     ),
@@ -190,7 +195,8 @@ class _PricesPageState extends State<PricesPage> {
                                   Text(
                                     item['price']!,
                                     style: TextStyle(
-                                      fontFamily: 'NotoSansArabic_SemiCondensed',
+                                      fontFamily:
+                                          'NotoSansArabic_SemiCondensed',
                                       fontSize: 12,
                                       color: Color.fromARGB(255, 15, 75, 6),
                                     ),

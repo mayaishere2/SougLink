@@ -11,6 +11,10 @@ analyzer:
   errors:
     prefer_const_constructors: ignore
 include: package:flutter_lints/flutter.yaml
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
 
 linter:
   # The lint rules applied to this project can be customized in the

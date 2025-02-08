@@ -12,30 +12,18 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
-<<<<<<< Updated upstream
-=======
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
->>>>>>> Stashed changes
 buildscript {
     dependencies {
-    classpath 'com.android.tools.build:gradle:7.3.1' // Ensure Gradle version is correct
-    classpath 'com.google.gms:google-services:4.3.8'  // Ensure this is present // Add this line if missing
-
+        classpath 'com.android.tools.build:gradle:7.3.1' // Ensure Gradle version is correct
+        classpath 'com.google.gms:google-services:4.3.8'  // Ensure this is present
     }
     repositories {
         google()
         mavenCentral()
     }
-<<<<<<< Updated upstream
 }
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
-}
-=======
-}
->>>>>>> Stashed changes

@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:souglink/market_owner/mainPageSeller.dart';
 import 'SellerDrawer.dart';
-
-// Initialize local notifications
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -18,111 +11,50 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   bool isNotificationsSelected = true; // Tracks the active button
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  // List of notifications
-  List<Map<String, String>> notifications = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeFCM();
-    _getFCMToken();
-  }
-
-  void _getFCMToken() async {
-    String? token = await FirebaseMessaging.instance.getToken();
-    print("FCM Token: $token");
-  }
-
-  Future<void> _initializeFCM() async {
-    await Firebase.initializeApp();
-
-    // Request notification permissions (iOS & Android)
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("Notifications: Permission granted");
-    } else {
-      print("Notifications: Permission denied");
-    }
-
-    // Get the FCM token (for backend use)
-    _firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
-    });
-
-    // Listen for foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Foreground message received: ${message.notification?.title}");
-
-      String product = message.data['product'] ?? 'منتج مجهول';
-      int quantity = int.tryParse(message.data['quantity'] ?? '0') ?? 0;
-
-      if (quantity < 10) {
-        _showLocalNotification(RemoteNotification(
-          title: "تنبيه المخزون",
-          body: "الكمية المتبقية من $product أقل من 10!",
-        ));
-
-        setState(() {
-          notifications.add({
-            'product': product,
-            'time': 'الآن',
-            'message': "الكمية المتبقية من $product أقل من 10!",
-          });
-        });
-      }
-    });
-
-    // Listen for background & terminated messages
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("User opened a notification: ${message.notification?.title}");
-    });
-
-    // Initialize local notifications
-    _initializeLocalNotifications();
-  }
-
-  // Initialize local notifications for displaying notifications while in foreground
-  void _initializeLocalNotifications() {
-    const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: androidInitializationSettings);
-
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  // Show local notification
-  Future<void> _showLocalNotification(RemoteNotification notification) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'high_importance_channel',
-      'High Importance Notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      notification.title,
-      notification.body,
-      platformChannelSpecifics,
-    );
-  }
+  // Dummy data for notifications
+  final List<Map<String, String>> notifications = [
+    {
+      'product': 'الطماطم',
+      'time': 'اليوم',
+      'message':
+          'مستوى مخزون منتج الطماطم قارب على النفاد. يرجى التحقق من الكميات المتاحة قريبًا.'
+    },
+    {
+      'product': 'البطاطا',
+      'time': 'منذ يومين',
+      'message':
+          'مستوى مخزون منتج البطاطا قارب على النفاد. يرجى التحقق من الكميات المتاحة قريبًا.'
+    },
+    {
+      'product': 'التفاح',
+      'time': 'منذ أسبوع',
+      'message':
+          'مستوى مخزون منتج التفاح قارب على النفاد. يرجى التحقق من الكميات المتاحة قريبًا.'
+    },
+    {
+      'product': 'الجزر',
+      'time': 'اليوم',
+      'message':
+          'مستوى مخزون منتج الجزر قارب على النفاد. يرجى التحقق من الكميات المتاحة قريبًا.'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
+    // Group notifications by time period
+    Map<String, List<Map<String, String>>> groupedNotifications = {
+      'اليوم': [],
+      'منذ يومين': [],
+      'منذ أسبوع': [],
+    };
+
+    for (var notification in notifications) {
+      groupedNotifications[notification['time']]?.add(notification);
+    }
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -145,16 +77,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     },
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 18.0),
-                  child: Text(
-                    'الإشعارات',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'NotoSansArabic_SemiCondensed',
-                      fontSize: 20,
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 18.0),
+                      child: const Text(
+                        'الإشعارات',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'NotoSansArabic_SemiCondensed',
+                          fontSize: 20,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
@@ -169,7 +105,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  // Toggle buttons
+                  // Animated Toggle Button
                   Container(
                     width: 300,
                     decoration: BoxDecoration(
@@ -184,11 +120,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               setState(() {
                                 isNotificationsSelected = false;
                               });
+                              // Navigate to the responses page
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        MainPageSeller(activeIndex: 5)),
+                                    builder: (context) => MainPageSeller(
+                                          activeIndex: 5,
+                                        )),
                               );
                             },
                             child: AnimatedContainer(
@@ -197,7 +135,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               decoration: BoxDecoration(
                                 color: !isNotificationsSelected
                                     ? const Color.fromARGB(255, 15, 75, 6)
-                                    : Colors.transparent,
+                                    : const Color.fromARGB(0, 26, 103, 14),
                                 borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(15),
                                   bottomRight: Radius.circular(15),
@@ -209,6 +147,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 'الردود على الطلبات',
                                 style: TextStyle(
                                   color: Colors.white,
+                                  fontFamily: 'NotoSansArabic_SemiCondensed',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -229,8 +168,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               decoration: BoxDecoration(
                                 color: isNotificationsSelected
                                     ? const Color.fromARGB(255, 15, 75, 6)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(15),
+                                    : const Color.fromARGB(0, 26, 103, 14),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(15),
+                                  bottomLeft: const Radius.circular(15),
+                                  topRight: isNotificationsSelected
+                                      ? const Radius.circular(15)
+                                      : const Radius.circular(0),
+                                  bottomRight: isNotificationsSelected
+                                      ? const Radius.circular(15)
+                                      : const Radius.circular(0),
+                                ),
                               ),
                               alignment: Alignment.center,
                               height: 30,
@@ -238,6 +186,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 'الإشعارات',
                                 style: TextStyle(
                                   color: Colors.black,
+                                  fontFamily: 'NotoSansArabic_SemiCondensed',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -249,40 +198,64 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: notifications.length,
-                      itemBuilder: (context, index) {
-                        final notification = notifications[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 10),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
+                    child: ListView(
+                      children: groupedNotifications.entries.map((entry) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Divider(
+                              color: const Color.fromARGB(255, 15, 75, 6),
+                              thickness: 1.5,
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.notifications_active,
-                                    color: Color.fromARGB(255, 176, 48, 39)),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    notification['message']!,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontFamily:
-                                          'NotoSansArabic_SemiCondensed',
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                entry.key,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color.fromARGB(255, 15, 75, 6),
+                                  fontFamily: 'NotoSansArabic_SemiCondensed',
+                                ),
+                              ),
+                            ),
+                            ...entry.value.map((notification) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 10),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.notifications_active,
+                                        color: Color.fromARGB(255, 176, 48, 39),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          notification['message']!,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontFamily:
+                                                'NotoSansArabic_SemiCondensed',
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
+                              );
+                            }).toList(),
+                          ],
                         );
-                      },
+                      }).toList(),
                     ),
                   ),
                 ],

@@ -94,7 +94,11 @@ BEGIN
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "souglink" "\0"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
+=======
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+>>>>>>> Stashed changes
 =======
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
 >>>>>>> Stashed changes

@@ -13,7 +13,7 @@ dependencies:
   shared_preferences: ^2.0.17
   flutter_localizations:
     sdk: flutter
-  fl_chart: 0.69.2
+  fl_chart: ^0.69.2
   sqflite: ^2.0.0+3
   flutter_bloc: ^8.0.0
   bloc: ^8.0.0
@@ -28,6 +28,7 @@ dependencies:
   firebase_storage: ^12.4.2
   firebase_messaging: ^15.2.2
   flutter_dotenv: ^5.2.1
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:

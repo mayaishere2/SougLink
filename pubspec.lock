@@ -9,6 +9,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.51"
+<<<<<<< Updated upstream
+=======
+  args:
+    dependency: transitive
+    description:
+      name: args
+      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.0"
+>>>>>>> Stashed changes
   async:
     dependency: transitive
     description:
@@ -17,6 +28,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+<<<<<<< Updated upstream
   bloc:
     dependency: "direct main"
     description:
@@ -25,6 +37,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.1.4"
+=======
+>>>>>>> Stashed changes
   boolean_selector:
     dependency: transitive
     description:
@@ -81,6 +95,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+<<<<<<< Updated upstream
   cross_file:
     dependency: transitive
     description:
@@ -89,6 +104,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.4+2"
+=======
+>>>>>>> Stashed changes
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -97,8 +114,21 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+<<<<<<< Updated upstream
   equatable:
     dependency: "direct main"
+=======
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "79e0c23480ff85dc68de79e2cd6334add97e48f7f4865d17686dd6ea81a47e8c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.11"
+  equatable:
+    dependency: transitive
+>>>>>>> Stashed changes
     description:
       name: equatable
       sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
@@ -129,6 +159,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+<<<<<<< Updated upstream
   file_selector_linux:
     dependency: transitive
     description:
@@ -161,6 +192,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+3"
+=======
+>>>>>>> Stashed changes
   firebase_auth:
     dependency: "direct main"
     description:
@@ -209,6 +242,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.20.0"
+<<<<<<< Updated upstream
   firebase_database:
     dependency: "direct main"
     description:
@@ -233,6 +267,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.6+8"
+=======
+>>>>>>> Stashed changes
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -257,6 +293,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.10.2"
+<<<<<<< Updated upstream
   firebase_storage:
     dependency: "direct main"
     description:
@@ -283,6 +320,10 @@ packages:
     version: "3.10.9"
   fl_chart:
     dependency: "direct main"
+=======
+  fl_chart:
+    dependency: "direct dev"
+>>>>>>> Stashed changes
     description:
       name: fl_chart
       sha256: "74959b99b92b9eebeed1a4049426fd67c4abc3c5a0f4d12e2877097d6a11ae08"
@@ -294,6 +335,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< Updated upstream
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -310,6 +352,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+=======
+>>>>>>> Stashed changes
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -318,11 +362,39 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+<<<<<<< Updated upstream
+=======
+  flutter_local_notifications:
+    dependency: "direct main"
+    description:
+      name: flutter_local_notifications
+      sha256: ef41ae901e7529e52934feba19ed82827b11baa67336829564aeab3129460610
+      url: "https://pub.dev"
+    source: hosted
+    version: "18.0.1"
+  flutter_local_notifications_linux:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_linux
+      sha256: "8f685642876742c941b29c32030f6f4f6dacd0e4eaecb3efbb187d6a3812ca01"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
+  flutter_local_notifications_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_platform_interface
+      sha256: "6c5b83c86bf819cdb177a9247a3722067dd8cc6313827ce7c77a4b238a26fd52"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.0"
+>>>>>>> Stashed changes
   flutter_localizations:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< Updated upstream
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -331,6 +403,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.24"
+=======
+>>>>>>> Stashed changes
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -342,6 +416,7 @@ packages:
     source: sdk
     version: "0.0.0"
   http:
+<<<<<<< Updated upstream
     dependency: "direct main"
     description:
       name: http
@@ -349,6 +424,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.6"
+=======
+    dependency: transitive
+    description:
+      name: http
+      sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
+>>>>>>> Stashed changes
   http_parser:
     dependency: transitive
     description:
@@ -357,6 +441,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+<<<<<<< Updated upstream
   image_picker:
     dependency: "direct main"
     description:
@@ -421,6 +506,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
+=======
+>>>>>>> Stashed changes
   intl:
     dependency: transitive
     description:
@@ -485,6 +572,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.0"
+<<<<<<< Updated upstream
   mime:
     dependency: transitive
     description:
@@ -501,6 +589,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+=======
+>>>>>>> Stashed changes
   path:
     dependency: transitive
     description:
@@ -533,6 +623,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+<<<<<<< Updated upstream
+=======
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
+>>>>>>> Stashed changes
   platform:
     dependency: transitive
     description:
@@ -549,6 +650,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+<<<<<<< Updated upstream
   provider:
     dependency: transitive
     description:
@@ -557,30 +659,53 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+=======
+>>>>>>> Stashed changes
   shared_preferences:
     dependency: "direct main"
     description:
       name: shared_preferences
+<<<<<<< Updated upstream
       sha256: "95f9997ca1fb9799d494d0cb2a780fd7be075818d59f00c43832ed112b158a82"
       url: "https://pub.dev"
     source: hosted
     version: "2.3.3"
+=======
+      sha256: "688ee90fbfb6989c980254a56cb26ebe9bb30a3a2dff439a78894211f73de67a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.1"
+>>>>>>> Stashed changes
   shared_preferences_android:
     dependency: transitive
     description:
       name: shared_preferences_android
+<<<<<<< Updated upstream
       sha256: "7f172d1b06de5da47b6264c2692ee2ead20bbbc246690427cdb4fc301cd0c549"
       url: "https://pub.dev"
     source: hosted
     version: "2.3.4"
+=======
+      sha256: "650584dcc0a39856f369782874e562efd002a9c94aec032412c9eb81419cce1f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4"
+>>>>>>> Stashed changes
   shared_preferences_foundation:
     dependency: transitive
     description:
       name: shared_preferences_foundation
+<<<<<<< Updated upstream
       sha256: "07e050c7cd39bad516f8d64c455f04508d09df104be326d8c02551590a0d513d"
       url: "https://pub.dev"
     source: hosted
     version: "2.5.3"
+=======
+      sha256: "6a52cfcdaeac77cad8c97b539ff688ccfc458c007b4db12be584fbe5c0e49e03"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.4"
+>>>>>>> Stashed changes
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -626,6 +751,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+<<<<<<< Updated upstream
   sqflite:
     dependency: "direct main"
     description:
@@ -666,6 +792,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+=======
+>>>>>>> Stashed changes
   stack_trace:
     dependency: transitive
     description:
@@ -690,6 +818,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+<<<<<<< Updated upstream
   synchronized:
     dependency: transitive
     description:
@@ -698,6 +827,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.0+3"
+=======
+>>>>>>> Stashed changes
   term_glyph:
     dependency: transitive
     description:
@@ -714,6 +845,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
+<<<<<<< Updated upstream
+=======
+  timezone:
+    dependency: transitive
+    description:
+      name: timezone
+      sha256: ffc9d5f4d1193534ef051f9254063fa53d588609418c84299956c3db9383587d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0"
+>>>>>>> Stashed changes
   typed_data:
     dependency: transitive
     description:
@@ -754,6 +896,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+<<<<<<< Updated upstream
+=======
+  xml:
+    dependency: transitive
+    description:
+      name: xml
+      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.5.0"
+>>>>>>> Stashed changes
 sdks:
   dart: ">=3.5.3 <4.0.0"
   flutter: ">=3.24.0"

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "763894853613",
+    "project_id": "souglink-9df24",
+    "storage_bucket": "souglink-9df24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763894853613:android:d83c6acb98ce59c4b8c1e4",
+        "android_client_info": {
+          "package_name": "com.example.souglink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763894853613-fk11a8v0rlukpd9ejfa480uhalobajci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkAJyeKpLKgJlKVdpyjp8wcv_s3n1mum8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763894853613-fk11a8v0rlukpd9ejfa480uhalobajci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
